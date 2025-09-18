@@ -1,0 +1,47 @@
+For Upgrade the OS from one version to Higher version we need to follow these steps
+
+step 1
+
+cat /etc/os-release
+
+step-2 
+
+Update Current System
+
+sudo apt update
+sudo apt upgrade -y
+sudo apt dist-upgrade -y
+sudo apt autoremove --purge -y
+
+
+step-3
+
+Install Update Manager (if not installed)
+
+sudo apt install update-manager-core
+
+Check configuration:
+
+cat /etc/update-manager/release-upgrades
+
+Ensure the line reads:
+Prompt=lts
+
+step-4
+
+Start the Upgrade
+
+sudo do-release-upgrade -d
+
+step-5
+
+sudo do-release-upgrade
+
+step-6
+
+sudo reboot
+
+step-7
+
+lsb_release -a  or  cat /etc/os-release
+
