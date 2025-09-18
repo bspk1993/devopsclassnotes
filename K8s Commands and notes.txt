@@ -1,0 +1,3492 @@
+Docker Swarm and Kubernetes are both container orchestration platforms, but they have different strengths and use cases
+
+Docker Swarm is easier to use and is better for smaller applications, while Kubernetes is more robust and better for large-scale applications.
+
+Docker Swarm is Docker’s native clustering and orchestration tool, designed to manage and scale containerized applications.
+
+While it provides simplicity and integration with Docker, it has several limitations compared to other orchestration solutions like Kubernetes.
+
+
+
+Limitations
+-----------
+
+Docker Swarm is generally considered less scalable than Kubernetes. While it can handle clusters with a reasonable number of nodes and services, Kubernetes is designed for larger-scale deployments and can manage thousands of nodes and pods.
+
+Swarm provides basic load balancing and routing but lacks the advanced capabilities like provided by K8S
+
+
+Kubernetes offers more granular security controls, including Role-Based Access Control (RBAC), network policies, and security policies. Docker Swarm’s security features are less comprehensive in comparison.
+
+Docker Swarm has a smaller community and less industry adoption compared to Kubernetes
+
+Docker carries containers as shown in logo
+And those are carried by K8S as it is a steering for docker with containers
+
+Docker is used to create containers, while Kubernetes is used to manage them
+
+DockerSwarm           Kubernetes
+===========           ==========
+Cluster               Cluster
+Nodes                 Nodes
+Containers            PODS
+Applications          Containers
+                      Applications
+
+
+
+====================================================================
+                 Kubernetes
+====================================================================
+
+Kubernetes is a powerful open-source platform for automating the deployment, scaling, and operation of application containers.
+
+Kubernetes is a Container Orchestration tool
+
+Orchestration is nothing but Cluster
+
+Kubernetes creates Cluster , deploy and manage clusters. Cluster is combination of 1 master and multiple nodes / Minion
+
+Kubernetes master will not take the load, it will distribute load to Nodes / Slaves
+
+Smallest object that Kubernetes can create is POD. WithIn POD, we have Container
+
+Cluster is a bunch of PODS and POD contains docker containers
+
+By using Kubernetes we form a cluster (group of PODS with docker containers)
+
+K8S schedules, runs and manage isolated PODS
+
+Kubernetes does not understand Containers
+
+Kubernetes can understand only PODS
+
+
+
+
+Features of Kubernetes
+---------------------
+
+Orchestration -- Clustering any number of containers on different hardwares / nodes
+Autoscaling
+Auto Healing -- New containers will create in case of containers crash. Same like Docker Swarm
+Load Balancing
+Roll Back  - Going to Previous Versions
+
+
+
+
+Here's a brief history of Kubernetes, from its origins to its current state:
+
+Origins and Predecessors
+========================
+
+Google's Borg:
+-------------
+
+The origins of Kubernetes can be traced back to Google's internal systems, particularly a system called Borg. Borg was a large-scale cluster management system that Google developed internally to manage its vast infrastructure. It allowed Google to deploy, manage, and scale applications across thousands of servers efficiently.
+
+Omega:
+-----
+
+After Borg, Google developed Omega, which was an evolution of Borg. Omega introduced a more flexible and modular architecture. It further refined the ideas of scheduling, resource management, and container orchestration.
+
+The Birth of Kubernetes
+=======================
+
+2014 - Project Launch:
+---------------------
+
+Kubernetes was officially announced by Google in mid-2014. It was initially developed by Google engineers Joe Beda, Brendan Burns, and Craig McLuckie.
+
+Kubernetes was designed based on the lessons learned from Borg and Omega, but it was intended to be open-source and available to the broader community.
+
+Open-Source and Community Involvement:
+--------------------------------------
+
+From the start, Kubernetes was designed as an open-source project, allowing developers from outside Google to contribute. It was released under the Apache 2.0 license, making it freely available for anyone to use and modify.
+
+
+Partnership with the Cloud Native Computing Foundation (CNCF):
+--------------------------------------------------------------
+
+In 2015, Kubernetes was donated to the CNCF, which was formed to foster and sustain the development of cloud-native technologies. This move helped Kubernetes gain significant traction in the open-source community and among enterprises.
+
+
+
+**************************************************************************************
+
+Kubernetes Architecture
+-----------------------
+
+Kubernetes architecture is designed to manage containerized applications across a cluster of machines efficiently.
+
+It follows a master-worker architecture where the master nodes control and manage the worker nodes.
+
+1. Master Nodes  - Control Plane
+2. Worker Nodes
+3. PODS
+4. Networking
+5. Volumes
+6. Namespaces
+7. Services
+
+MW- PNVNS
+
+
+Master Nodes (Control Plane)
+============================
+
+The master node is responsible for managing the Kubernetes cluster.
+
+It coordinates all activities within the cluster, including scheduling, scaling, and maintaining the desired state of the system.
+
+Key Components of the Master Node:
+------------------------------------
+
+ 1. API Server (kube-apiserver): The receptionist
+    ----------------------------------------------
+
+    The API server is the entry point for all REST commands used to control the cluster. communicate with user (takes command execute & give output).  kubectl is the command to communicate with API Server
+
+ 2. Scheduler (kube-scheduler): This will take Action
+------------------------------------------------------
+ 
+    The scheduler is responsible for placing the pods onto nodes within the cluster based on resource availability and other constraints. This Kube-Scheduler will communicate with the Nodes
+
+ 3. Controller Manager (kube-controller-manager):
+---------------------------------------------------
+
+    This component runs various controllers that regulate the state of the cluster.Node Controller (which handles node failures), Replication Controller (which maintains the correct number of pods), and more. It just control the k8s objects (n/w, service, Node)
+
+ 4. etcd
+---------
+
+    etcd is a key-value store used by Kubernetes to store all cluster data, including configuration data, state information, and metadata.  Database of the Cluster. It is a critical component, as it serves as the single source of truth for the cluster’s state.
+
+ 5. Cloud Controller Manager(Optional) :
+---------------------------------------
+ 
+    This component interacts with the underlying cloud infrastructure. It handles tasks like managing cloud resources (e.g., load balancers, volumes) in public or private cloud environments. It is responsible to make sure that the actual state is same as desired state.
+
+In Short Cut
+----------
+
+MASTER:
+
+1. API SERVER: Communicate with user (takes command execute & give op)
+2. CONTROLLER: Control the k8s objects (n/w, service, Node)
+3. SCHEDULER: Select the worker node to schedule pods (depends on hw of node)
+4. ETCD: Database of cluster (stores complete info of a cluster ON KEY-VALUE pair)
+
+ACSE
+
+Worker Nodes
+===============
+
+Worker nodes are the machines where the actual workload, in the form of containerized applications, runs.
+
+Each worker node contains several components that allow it to run and manage containers.
+
+Key Components of the Worker Node:
+---------------------------------
+
+1. Kubelet:
+   -------
+The kubelet is an agent that runs on every worker node. It ensures that containers are running in a pod as defined by the Kubernetes API. It communicates with the API server on the master node and manages the lifecycle of the containers on its node.
+
+Kubelet is the only component that will communicate with Master
+   
+2. Container Runtime:
+   ------------------
+
+This is the software responsible for running containers.
+
+The most common runtime is Docker, but Kubernetes also supports others like containerd and CRI-O.
+
+The container runtime pulls container images from a registry, unpacks them, and runs the application inside the containers.
+
+3. Kube-Proxy:
+   ----------
+
+Kube-proxy is a network proxy that runs on each worker node. It maintains network rules that allow communication between pods and services within the cluster.  It enables the network routing and load balancing of traffic within the Kubernetes cluster.
+
+Simply Kube-Proxy will Provide IP to the POD
+
+4. PODS:
+   -----
+
+Pods are the smallest and simplest Kubernetes objects. A pod represents a single instance of a running process in your cluster and can contain one or more containers.
+
+Pods are ephemeral, meaning they can be created and destroyed as needed, and are the unit of scaling in Kubernetes.
+
+
+In Short Cut
+------------
+
+WORKER NODES:
+
+1. KUBELET : Its an agent in worker node (it will inform all activities to master)
+2. KUBEPROXY: It deals with Network (ip, networks, ports)
+3. POD: Group of containers (inside pod we have application)
+
+KCKP
+
+
+Key Networking Concepts:
+-----------------------
+
+1. Cluster IP: An internal IP address that is assigned to a service within the cluster.
+
+2. NodePort: Exposes a service on a static port on each node’s IP.
+
+3. LoadBalancer: Provisions a load balancer in supported cloud environments to expose services externally.
+
+
+Volumes
+-------
+
+Kubernetes Volumes provide persistent storage to containers within pods, allowing data to persist across pod restarts.
+
+They can be backed by various storage backends, including local storage, cloud storage like AWS EBS
+
+Namespaces
+----------
+
+Namespaces are a way to divide cluster resources between multiple users.
+
+They provide a scope for names, meaning you can have multiple resources with the same name in different namespaces.
+
+Services
+--------
+
+Services are used to access our applications which is on the pods using Cluster IP(internal access) or Load Balancer (external access)
+
+
+
+K8S: CNPCA
+
+C : CLUSTER
+N : NODE
+P : POD
+C : CONTAINER
+A : APPLICATION
+
+In Kubernetes we need to Create Cluster. Cluster can create in 2 ways:  1. Self Managed 2. Cloud Based
+
+CLUSTER TYPES:
+-------------
+
+1. SELF MANAGED: WE NEED TO CREATE & MANAGE THEM
+
+minikube = single node cluster
+kubeadm = multi node cluster (manual)
+kops = multi-node cluster (automation)
+
+2. CLOUD-BASED: CLOUD PROVIDERS WILL MANAGE THEM
+
+AWS = EKS = ELASTIC KUBERNETES SERVICE
+AZURE = AKS = AZURE KUBERENETS SERVICE
+GOOGLE = GKS = GOOGLE KUBERENETS SERVICE
+
+
+Kubectl is the command line tool for Kubernetes
+
+If we want to execute commands we need to use kubectl.
+
+MINIKUBE:
+---------
+
+It is a tool used to setup single node cluster on K8's.
+
+Here Master and worker runs on same machine
+
+It contains API Servers, ETDC database and container runtime
+
+It is used for development, testing, and experimentation purposes on local.
+
+NOTE: But we don't implement this in real-time Prod
+
+
+Minikube Setup
+--------------
+
+Requirement
+------------
+
+Launch Ubuntu 24 with t2.small having min 8GB volume
+
+Install minikube and Kubectl
+
+vi minikube.sh
+
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt install curl wget apt-transport-https -y
+sudo curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+sudo chmod +x /usr/local/bin/minikube
+sudo minikube version
+sudo curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+sudo curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256&quot;
+sudo echo "$(cat kubectl.sha256) kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+sudo minikube start --driver=docker --force
+
+   
+
+KUBECTL:
+--------
+kubectl is the CLI which is used to interact with a Kubernetes cluster.
+
+We can create, manage pods, services, deployments, and other resources.
+
+The configuration of kubectl is in the $HOME/.kube directory.
+
+-- minikube status
+
+-- kubectl get nodes
+
+-- kubectl get pods
+
+PODS :
+=======
+
+It is a smallest unit of deployment in K8's.
+It is a group of containers.
+Pods are ephemeral (short living objects)
+Mostly we can use single container inside a pod but if we required, we can create multiple containers inside a same pod.
+when we create a pod, containers inside pods can share the same network namespace, and can share the same storage volumes .
+While creating pod, we must specify the image, along with any necessary configuration and resource limits.
+K8's cannot communicate with containers, they can communicate with only pods.
+
+We can create this pod in two ways,
+
+1. Imperative(command)
+
+2. Declarative (Manifest file) - can be reuse - in real time we go with declarative
+
+By default, one pod has one container, if required we can create, if you create multiple containers in a single pod, all containers inside the pods will share the same volume
+
+
+1. Imperative(command)
+-----------------------
+
+Example:
+--------
+
+-- kubectl run pod1 --image nginx    [Creating  pod with name pod1 with image nginx]
+
+-- kubectl get pods/pod/po           [To get the pods , can use pods/po/pods also]
+
+-- kubectl get pod -o wide           [To get details about the pod]
+
+-- kubectl describe pod pod1         [To get more details about the pod]
+
+-- kubectl delete pod pod1           [To delete the pod]
+
+Example 2:
+---------
+
+-- kubectl run reyaz --image nginx  [This will create a pod name reyaz , with nginx image ]
+
+-  kubectl get pods
+
+-- kubectl logs reyaz  
+
+-- kubectl exec -it reyaz -- /bin/bash   [to connect to the pod inside]
+   cd /usr/share/nginx/html
+   cat index.html
+
+-- kubectl delete pod reyaz   [This will delete the pod reyaz]
+
+
+The above approach we don't do, because need to create PODS manually , so lets go for manifest declarative approach
+
+
+================================================
+
+2. Declarative (Manifest file)
+-----------------------------
+
+In manifest file we have these mandatory parameters
+
+---------------------
+apiVersion:
+kind:
+metadata:
+spec:
+---------------------
+
+What is apiVersion?
+-------------------
+
+apiVersion: Specifies the API version used for the Deployment object. apps/v1 is the stable API version for managing deployments.
+            Depending on Kubernetes object we want to create, there is a corresponding code library we want to use.
+            apiVersion refers to Code Library
+
+Examples:
+---------
+
+POD : v1
+Service: v1
+NameSpace: v1
+Secrets: v1
+Replicaset: apps/v1
+Deployment: apps/v1
+jobs: batch/v1
+
+kubectl api-versions--- this is command
+
+What is kind ?
+--------------
+
+Refers to Kubernetes object which we want to create.
+
+Example:
+--------
+kind: Pod
+kind: Deployment
+kind: Service
+kind: Ingress
+Kind: ReplicaSet
+kind: ReplicaController
+
+What is metadata?
+----------------
+
+Additional information about the Kubernetes object like name, labels etc
+
+name: The name of the Deployment.
+labels: Key-value pairs used for organizing and selecting objects
+
+
+What is spec?
+------------
+
+Contains docker container related information like, image name, environment variables , port mapping etc
+
+How many number of pods (Replica)
+About container and that should run on which image
+On which port it should expose
+Labeling the entire deployment etc
+
+
+
+Sample manifest file
+--------------------
+
+apiVersion: v1
+kind: Pod  -- creating pod
+metadata:
+  name: pod1 -- name of the pod
+spec:  -- specifications
+  containers:
+    - image: nginx  -- image  name
+      name: cont1 -- container name
+
+-----------------
+
+vi pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+    - image: nginx
+      name: cont1
+
+-- kubectl create -f pod.yml    [ To create a pod using manifest]
+
+-- kubectl describe pod pod1    [ To describe pod ]
+
+-- kubectl delete pod pod1      [ To delete the pod ]
+
+DRAWBACK: once pod is deleted we can't retrieve the pod.
+
+If any pod deleted, it is deleted, no HA, for HA use ReplicaSET also called RS
+
+KUBECOLOR:
+
+wget https://github.com/hidetatz/kubecolor/releases/download/v0.0.25/kubecolor_0.0.25_Linux_x86_64.tar.gz
+tar -zxvf kubecolor_0.0.25_Linux_x86_64.tar.gz
+./kubecolor
+chmod +x kubecolor
+mv kubecolor /usr/local/bin/
+
+kubecolor get po
+
+-- kubectl create -f pod.yml  
+
+-- kubecolor get po
+
+
+In last class, we created a pod with manifest file, but we deleted that pod.
+
+If any pod deleted, it is deleted, no HA, for HA use ReplicaSET also called RS
+
+
+=================
+REPLICASET
+=================
+
+This is used for managing multiple replicas of pod to perform activities like load balancing and autoscaling
+
+Setup minikube with ubuntu 24 as per installation process
+
+
+It will create replicas of same pod.
+
+we can use same application with multiple pods.
+
+Even if one pod is deleted automatically it will create another pod. It has self healing mechanism
+
+Depends on requirement we can scale the pods.
+
+We create rs --> rs will create pods
+
+LABELS:
+-------
+
+As we are creating multiple pods with same application, all these pods have different names but how to group all of them as we have 1 application with multiple pods. So we can give a label to group them
+
+Individual pods are difficult to manage because they have different names
+so we can give a common label to group them and work with them together
+
+SELECTOR
+--------
+
+It is used to select pods with same labels
+
+For replicaset use apiversion as apps/v1
+
+how to find the apiresources to write in manifest file
+
+kubectl api-resources
+
+vi replicaset.yml
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: ib-rs    ---------- Name of the Replicaset
+  labels:
+    app: bank
+spec:     ------------- this spec is for PODS
+  replicas: 3   --------- how many number of pods
+  selector:
+    matchLabels:  -Ensures only pods with label app: bank are part of this Replicaset. if there is any pod with label bank, it will be a part of this replicaset
+      app: bank
+  template:            ------------ Ensures the pods get labeled as app: bank
+    metadata:
+      labels:
+        app: bank
+    spec:  ----------------- this spec is for containers
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+
+
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: ib-rs
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:  
+    metadata:
+      labels:
+        app: bank
+    spec:  
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+
+
+
+-- kubectl create -f replicaset.yml
+
+-- kubectl get replicaset
+
+       (or)
+
+-- kubectl get rs
+
+-- kubectl get rs -o wide  [This command will get more details about ReplciaSets]
+
+-- kubectl describe rs ib-rs  [This will describe about internetbanking-rs ]
+
+-- kubectl get pods
+
+-- kubectl get pods --show-labels   [This will list the pods with Labels]
+
+If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
+
+-- kubectl get pods --watch
+
+-- kubectl get pods
+
+-- kubectl delete pods pod-id      [First new pod create and the existing pod will be deleted]
+
+-- kubectl get pods --show-labels  [New pod got created, this is called ReplicaSet, if one pod delete , another pod will get created automatically]
+
+-- kubectl get pods -l app=bank  [This will list all the pods with label bank, l = label]
+
+-- kubectl delete pods -l app=bank  [To delete all the pods wit label bank]
+
+Note: Replicaset will take image details from manifest file -- replicaset.yml
+
+==============
+SCALE REPLICAS - Scale Out and Scale In
+==============
+
+Scale Out
+--------
+
+First open anotherwindows live
+
+-- kubectl get pods --watch
+
+
+-- kubectl get rs   [To list the replicasets]
+
+-- kubectl scale rs/ib-rs --replicas=10  [Now see pods creating live]
+
+Scale In
+--------
+
+-- kubectl scale rs/ib-rs --replicas=5  [Now see pods creating live]
+
+LIFO: LAST IN FIRST OUT.
+
+IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
+
+Note: This Scale out and in is manual, later we learn how to automate
+
+Now, all pods are running with ib-image:latest image , but if i want to change the image to mobilebanking and update the POD, not possible in ReplicaSet
+
+-- kubectl describe pod -l app=bank | grep -i ID   [ALl pods are using ib-image:latest]
+
+Update the image in the replicaset, you cannot update in yml file, it will create a new replicaSet so there is a command to edit current replicaset
+
+-- kubectl edit rs/ib-rs    [change internetbankingrepo to insurance]
+
+-- kubectl describe pod -l app=bank | grep -i ID  [Still it shows internetbanking, image is not change , that's the problem with Replica SET, We cannot update the application]
+
+
+vi replicaset.yml  -- change to insurance
+
+-- kubectl apply -f replicaset.yml
+
+-- kubectl get pods --show-labels
+
+-- kubectl describe pod -l app=bank | grep -i ID   [you still see old image internetbanking ]
+
+But if you scale out, new pods will contains insurance repo
+
+-- kubectl scale rs/ib-rs --replicas=5
+-- kubectl describe pod -l app=bank | grep -i ID  [you see mobilebanking . only new image are insurance.
+                                                   This is the drawback of replicaset]
+
+Using ReplicaSet we cannot roll out the application
+
+Advantage
+-- self healing
+-- scaling
+
+Drawbacks
+ -- we cannot roll in and roll out, we cant update the applications using ReplicaSet, lets use DEPLOYMENT
+
+rs ---> pods
+
+kubectl delete rs ib-rs
+~
+
+ReplicationController:
+=======================
+
+Same as ReplicaSet. It also used for handling multiple replicas of specific pod. But it doesn't contain selector and its child field matchField. matchField where it will search for pods based on a specific label name and adds them to Cluster
+                                                                                             
+
+Kind : ReplicationController
+
+This below code doesn't contain matchLabels Field
+******************************************
+
+apiVersion: apps/v1
+kind: ReplicationController
+metadata:
+  name: ib-rs
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  template:  
+    metadata:
+      labels:
+        app: bank
+    spec:  
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+		
+-----------------------------------
+Replication Controller
+----------------------------------
+
+The Replication Controller is the original form of replication in Kubernetes
+
+The Replication Controller uses equality-based selectors to manage the pods.
+
+The rolling-update command works with Replication Controllers
+
+Replica Controller is deprecated and replaced by ReplicaSets.
+
+Replica Set  
+------------
+
+ReplicaSets are a higher-level API that gives the ability to easily run multiple instances of a given pod
+
+ReplicaSets Controller uses set-based selectors to manage the pods.
+
+The rolling-update command won’t work with ReplicaSets.
+
+Deployments are recommended over ReplicaSets.
+
+=====================
+DEPLOYMENT
+=====================
+
+Kubernetes Deployment
+---------------------
+Kubernetes deployment is a high-level resource object by which you can manage the deployment and scaling of the applications while maintaining the desired state of the application. You can scale the containers with the help of Kubernetes deployment up and down depending on the incoming traffic. If you have performed any rolling updates with the help of deployment and after some time if you find any bugs in it then you can perform rollback also. Kubernetes deployments are deployed with the help of CLI like Kubectl it can be installed on any platform.
+
+Before, we used ReplicaSet, ReplicaSet will create pods
+
+Now, Deployment can create ReplicaSet and ReplicaSet will create PODS
+
+deployment create rs---> rs will create Pods
+
+We can update the application.
+
+First delete the existing ReplicaSet
+
+-- kubectl delete rs ib-rs
+
+-- kubectl get rs
+
+-- kubectl get pods
+
+
+copy replicaset.yml to deployment.yml
+
+cp replicaset.yml deployment.yml
+
+vi yml --> Just change  "kind: Deployment" and "name: ib-deployment"
+-----------------------------------------------------------------
+
+and image to internetbanking for to understand better
+
+vi deployment.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+
+
+-- kubectl create -f deployment.yml
+
+-- kubectl get deploy   or kubectl get deployments
+
+-- kubectl get deploy -o wide
+
+-- kubectl get rs  -----> Deploy will create ReplicaSet
+
+-- kubectl describe deploy ib-deployment
+
+-- kubectl get pods
+
+[Note: delete the deployment: kubectl delete deploy deploymentname]
+
+Now lets scale out and Scale IN
+
+Scale Out
+---------
+
+-- kubectl scale deploy/ib-deployment --replicas=10
+
+-- kubectl get pods
+
+
+Scale In
+--------
+
+-- kubectl scale deploy/ib-deployment --replicas=5
+
+-- kubectl get pods
+
+What ever Replica set is doing Deployment is also doing the same thing
+
+if you delete any pod, it will create immediately automatically
+
+-- kubectl get pods
+
+-- kubectl delete pod pod-id
+
+-- kubectl describe pod -l app=bank | grep -i ID
+
+(or)
+
+-- kubectl describe pods | grep -i image   [It shows all internetbankingrepo image]
+
+***************** Now what Deployment do additional thing is to change the application ***************
+
+First watch pods in another terminal
+
+-- kubectl get po --watch
+
+-- kubectl edit deploy/ib-deployment   [change to mobilebanking]
+
+watch pods in another terminal , first it will create a new pods and then terminate old ones
+
+-- kubectl describe pods | grep -i image [you can see now mobilebanking image]
+
+
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+
+============
+RollOut Few commands
+============
+
+-- kubectl rollout history deploy/ib-deployment
+
+-- kubectl rollout undo deploy/ib-deployment   [It will go back to previous application / image ]
+
+-- kubectl get pods  [Pods are terminating and creating new pods with new image, this was not possible in ReplicaSet]
+
+-- kubectl describe pods | grep -i image
+
+-- kubectl rollout pause deploy/ib-deployment  --- it is like lock, cannot undo, cannot rollout to previous
+
+-- kubectl rollout undo deploy/ib-deployment  -- not possible
+
+-- kubectl rollout resume deploy/ib-deployment
+
+-- kubectl rollout undo deploy/ib-deployment -- now possible
+
+-- kubectl rollout status deploy/ib-deployment
+
+
+====================================================
+
+If you want port to expose , use below code
+
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+        ports:
+        - containerPort: 8080   # Port inside the container
+          hostPort: 8080        # Port on the host machine
+
+
+🔹 Explanation of Changes
+---------------------------
+✅ containerPort: 8080 → The app runs inside the container on port 8080.
+✅ hostPort: 8080 → The container maps its 8080 port to the same port on the host machine.
+
+🔹 Important Notes on hostPort
+----------------------------------
+hostPort directly binds the container port to the host.
+It works only on worker nodes where the pod runs.
+If multiple pods run on the same node, you cannot use the same hostPort for all of them.
+Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.
+------------------------
+
+By default, a ReplicaSet (RS) only ensures that a specific number of Pods are running. However, it does not provide network access to those Pods externally.
+
+✅ To access your application from the internet, you need a Kubernetes Service.
+
+
+=======================================================================================================================================
+
+=======================================
+🚀 Kubernetes Manifest: 1 Pod with 2 Containers
+===============================================
+
+In Kubernetes, a Pod can run multiple containers that share the same network and storage. Here’s how to create a single Pod with two containers inside it.
+
+vi pod-two-containers.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-container-pod
+  labels:
+    app: multi-container
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: busybox-container
+    image: busybox
+    command: ["sh", "-c", "while true; do echo 'Hello from BusyBox'; sleep 10; done"]
+
+
+
+-c: Tells sh to execute the following string command
+
+-- kubectl apply -f pod-two-containers.yaml
+
+-- kubectl get pods    [we get single pod but 2/2 meaning, 2 containers]
+
+-- kubectl logs two-container-pod -c busybox-container
+
+-- kubectl logs two-container-pod -c nginx-container
+
+-- kubectl exec -it two-container-pod -c nginx-container -- sh       [-c: container]
+
+   cd /usr/share/nginx/html
+
+-- kubectl exec -it two-container-pod -c busybox-container -- sh
+   
+   ls
+
+
+
+Kubernetes JOBS
+================
+
+Kubernetes Jobs are resources used to run batch tasks in a Kubernetes cluster. They ensure that a specified number of Pods successfully complete a task before marking the Job as done. Jobs are crucial for executing one-time or recurring tasks, such as data migrations, backups, or batch processing.
+
+Types of Kubernetes Jobs:
+===========================
+
+Non-parallel Jobs:
+------------------
+These Jobs execute tasks sequentially /one by one, with only one Pod started unless it fails. The Job completes as soon as its Pod terminates successfully.
+
+Parallel Jobs with a Fixed Completion Count:
+-------------------------------------------
+In these Jobs, multiple Pods run simultaneously to complete a task. The Job is considered complete when a specified number of Pods successfully complete their tasks.
+
+Parallel Jobs with a Work Queue:
+--------------------------------
+These Jobs dynamically scale Pods based on workload. Pods coordinate with each other or external services to fetch and process tasks from a shared queue.
+
+Real-world Use Cases:
+======================
+
+Non-parallel Jobs: Running one-time administrative tasks, such as database migrations or system updates.
+-----------------
+
+Parallel Jobs with a Fixed Completion Count: Processing large datasets, where data is split into chunks and processed concurrently by  
+-------------------------------------------  multiple Pods.
+
+Parallel Jobs with a Work Queue: Handling variable workloads, such as incoming requests in a web application, where Pods scale
+-------------------------------  dynamically based on demand.
+
+
+vi nonparallel.yml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: non-parallel-job
+spec:
+  template:
+    metadata:
+      name: non-parallel-pod
+    spec:
+      containers:
+      - name: non-parallel-container
+        image: busybox
+        command: ["echo", "Hello from the non-parallel job"]
+      restartPolicy: Never
+  completions: 3
+
+
+busybox: BusyBox is a single executable that bundles multiple Unix utilities (like sh, ls, cat, echo, wget, grep, etc.). It is widely used in minimal containers because of its small size (~1MB) and fast startup time.
+
+completions: 3 → The Job completes only when 3 Pods have successfully run.
+
+restartPolicy: Always, OnFailure, Never
+-------------------------------
+Always: Always restarts the container if it exits. Use Case: Default for Deployments & ReplicaSets
+------                                               --------
+OnFailure: Restarts the container only if it exits with an error (non-zero exit code). Use case: Jobs & CronJobs
+----------                                                                             --------
+Never: Never restarts the container, even if it fails. Use Case: Jobs & CronJobs (One-time execution)
+------                                                 --------
+
+
+
+-- kubectl apply -f nonparallel.yml
+
+-- kubectl get pods
+
+-- kubectl get jobs
+
+-- kubectl logs -l job-name=non-parallel-job
+
+-- kubectl logs podname     Ex: kubectl logs non-parallel-job-2vvf9
+
+-- kubectl delete job jobname
+
+In above example the pods are executing one by one.
+
+
+Parallel Jobs with a Fixed Completion Count
+---------------------------------------------
+Use the below simple manifest file for testing Parallel Jobs with a Fixed Completion Count jobs:
+
+vi parallelfixed.yml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-fixed-count-job
+spec:
+  template:
+    metadata:
+      name: parallel-fixed-count-pod
+    spec:
+      containers:
+      - name: parallel-fixed-count-container
+        image: busybox
+        command: ["echo", "Hello from the parallel-fixed-count job"]
+      restartPolicy: Never
+  completions: 6
+  parallelism: 3
+
+
+completions: 6 → The Job completes only when 5 Pods have successfully run.
+parallelism: 3 → Runs 3 Pods at the same time.
+
+
+-- kubectl apply -f parallelfixed.yml
+
+-- kubectl get pods
+
+-- kubectl get jobs
+
+-- kubectl logs -l job-name=<job-name>
+
+-- kubectl logs podname     Ex: kubectl logs parallel-job-2vvf9
+
+-- kubectl delete job jobname
+
+In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
+
+Parallel Jobs with a Work Queue
+--------------------------------
+Use the below simple manifest file for testing Parallel Jobs with a Work Queue jobs:
+
+vi parallel-work-queue-job.yaml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-work-queue-job
+spec:
+  template:
+    metadata:
+      name: parallel-work-queue-pod
+    spec:
+      containers:
+      - name: parallel-work-queue-container
+        image: busybox
+        command: ["echo", "Hello from the parallel-work-queue job"]
+      restartPolicy: Never
+  parallelism: 3
+
+-- kubectl apply -f parallel-work-queue-job.yaml
+
+-- kubectl get pods
+
+In the above example 3 pods are started executing at a time since we mentioned Parallelism = 3 and we didn’t mention any specified number of Completions.
+                           
+
+🚀 Kubernetes CronJob Example
+===============================
+
+A Kubernetes CronJob is used to schedule jobs to run at specific times, just like a Linux cron job. It is useful for tasks such as backups, periodic data processing, or sending scheduled reports.
+
+
+This CronJob prints "Hello from Kubernetes!" every minute.
+
+
+vi cron.yml
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/1 * * * *"  # Runs every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello-container
+            image: busybox
+            command: ["sh", "-c", "echo Hello from Kubernetes!"]
+          restartPolicy: Never  # Ensure job runs only once per schedule
+
+
+-- kubectl apply -f cron.yaml
+
+-- kubectl get cronjobs
+
+-- kubectl describe cronjob cron
+
+
+🔹 View Logs of Last Run
+---------------------------
+
+-- kubectl get pods  # Get the latest pod name
+
+-- kubectl logs <POD_NAME>
+
+-- kubectl get cronjob
+
+-- kubectl delete cronjob
+==============================
+   KOPS
+==============================
+
+Kops (Kubernetes Operations) is a command-line tool that helps you create, manage, upgrade, and destroy Kubernetes clusters on cloud providers like AWS, GCP, and more.
+
+It's often referred to as the "kubectl" for clusters, and it is a popular choice for creating production-grade Kubernetes clusters on AWS.
+
+Advantages
+-------------
+Automate infra creation in AWS and GCE Kubernetes cluster
+
+Deploys HA K8S master
+
+Supports rolling updates
+
+supports homogenous and heterogenous clusters.
+
+save time and work.
+
+Alternatives: EKS, MINIKUBE, KUBEADM, RANCHER
+------------
+
+KOPS will just create Production level Cluster, its a 3rd party tool
+
+=======================================================
+                          KOPS Setup
+========================================================
+
+Launch Amazon Linux 2 EC2 instance with t2.micro
+
+Make sure AWS CLI is installed. Attach a IAM Role with Admin permissions
+
+Install kubectl and kops
+=======================
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+wget https://github.com/kubernetes/kops/releases/download/v1.25.0/kops-linux-amd64
+chmod +x kops-linux-amd64 kubectl
+mv kubectl /usr/local/bin/kubectl
+mv kops-linux-amd64 /usr/local/bin/kops
+
+copy paste all at a time if required
+
+vi .bashrc
+
+export PATH=$PATH:/usr/local/bin/
+
+wq!
+
+appends /usr/local/bin/ to the system's $PATH environment variable, allowing you to execute binaries located in /usr/local/bin/ from anywhere in the terminal without specifying the full path.
+
+--- source .bashrc
+
+in ubuntu no need to do above steps, but for amazon Linux yes
+
+Creating bucket TO STORE CLUSTER INFO
+=====================================
+
+Storing cluster info in s3 bucket because just in case if we loose K8S cluster we can get from S3
+Either you can create a bucket manually using console or run below commands
+
+--> aws s3api create-bucket --bucket reyaz-kops-testbkt123.k8s.local --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
+
+
+--> aws s3api put-bucket-versioning --bucket reyaz-kops-testbkt123.k8s.local --region ap-south-1 --versioning-configuration Status=Enabled
+
+--> export KOPS_STATE_STORE=s3://reyaz-kops-testbkt123.k8s.local
+
+--> kops create cluster --name reyaz.k8s.local --zones ap-south-1a --master-count=1 --master-size t2.medium --node-count=2 --node-size t2.micro
+
+--> kops update cluster --name reyaz.k8s.local --yes --admin
+
+kops update cluster → Updates the Kubernetes cluster configuration.
+--name reyaz.k8s.local → Specifies the cluster name (replace with your actual cluster name).
+--yes → Applies the changes automatically (without requiring manual confirmation).
+--admin → Grants the current user admin privileges in the cluster.
+
+
+--> kops validate cluster --wait 10m
+
+This command checks if your Kubernetes cluster is fully functional and waits up to 10 minutes for all nodes and components to become ready.
+
+
+For Future Reference
+
+Suggestions:
+ * list clusters with: kops get cluster
+ * edit this cluster with: kops edit cluster reyaz.k8s.local
+ * edit your node instance group: kops edit ig --name=reyaz.k8s.local nodes-ap-south-1a
+ * edit your master instance group: kops edit ig --name=reyaz.k8s.local master-ap-south-1a
+
+See in AWS Console, EC2 instances are launched with ASG and load balancer
+
+By default KOPS will create CLB. If you want KOPS to create ALB
+
+kops edit cluster --name reyaz.k8s.local    [change classic to Network]
+
+spec:
+  api:
+    loadBalancer:
+      class: Classic
+      type: Public
+
+
+Note: just try to delete now worker node or master node, ASG will create it immediately
+
+-- kops get cluster
+
+-- kubectl get nodes
+
+-- kubectl get nodes -o wide
+
+
+vi deployment.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: pennerusravan/ib-image:latest
+
+-- kubectl create -f deployment.yml
+
+-- kubectl get pods
+
+-- kubectl get nodes -o wide
+
+Manager node will not host pods himself, K8S will create pods only in worker nodes
+
+-- kubectl get pods -o wide   [see the nodes, pods spread across nodes equally]
+
+Example: if you want 4 pods , edit yml file and update replicas to 4
+
+-- kubectl apply -f deployment.yml
+
+-- kubectl get no -o wide
+
+===========================
+Few Cluster Admin Activities
+==========================
+
+Currently we have now only 1 master nodes and 2 worker nodes
+
+KOPS commands are used for cluster activities.
+KUBECTL commands are used for resource activities.
+
+annotations
+----------
+ig =  instance group
+
+WorkerNodes = nodes-ap-south-1a
+
+Scale Out Worker Nodes
+----------------------
+
+-- kops edit ig --name=reyaz.k8s.local nodes-ap-south-1a
+           --> max size = 4, min size = 4
+
+-- kops update cluster --name reyaz.k8s.local --yes --admin
+
+-- kops rolling-update cluster --yes
+
+See in AWS Console , 2 additional worker nodes got created
+
+-- kubectl get nodes   [takes time to show]
+
+Scale out Master Nodes
+----------------------
+
+-- kops edit ig --name=reyaz.k8s.local master-ap-south-1a
+           --> max size = 2, min size = 2
+
+-- kops update cluster --name reyaz.k8s.local --yes --admin
+
+-- kops rolling-update cluster --yes
+
+See in AWS Console , 1 additional Master nodes got created
+
+-- kubectl get nodes  [takes time to show]
+
+*************************************************************************
+IF ERROR
+=======
+🔹 Step 3: If Kubelet is Installed but Not Found in Systemd
+If kubelet is installed but still not found in systemd, try reloading systemd:
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+If the issue persists, manually add the systemd service file:
+
+sudo nano /etc/systemd/system/kubelet.service
+
+[Service]
+ExecStart=/usr/bin/kubelet
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
+Then reload and start:
+
+sudo systemctl daemon-reload
+sudo systemctl enable kubelet
+sudo systemctl restart kubelet
+
+🔹 Step 4: Check Logs for Errors
+If kubelet is still failing, check logs:
+
+sudo journalctl -u kubelet -f
+*******************************************************
+Example: Lets do a new deployment again
+--------------------------------------
+
+Before that clean up
+
+-- kubectl get deployments
+
+-- kubectl delete deploy ib-deployment
+
+-- kubectl get pods
+
+vi deploynew.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/mb-image:latest
+
+-- kubectl create -f deploynew.yml
+
+-- kubectl get po -o wide   [Now all pods are spread across 4 worker nodes]
+
+If you want to scale out pods
+-------------------------
+
+-- kubectl scale deploy/mb-deployment --replicas=10
+
+-- kubectl get pods -o wide
+
+If you want to scale in pods
+-------------------------
+
+-- kubectl scale deploy/mb-deployment --replicas=4
+
+-- kubectl get pods -o wide
+
+============================================================================================================================================
+===============
+NAMESPACES
+===============
+
+Generally we cannot create multiple Cluster for each team(expensive), instead we create a NameSpaces in one Cluster for each team
+
+Namespaces will not talk to each other, its an isolated space in one Cluster
+
+Each namespaces can see their own pods
+
+TYPES:
+
+default            : This is default namespace, all objects are created here
+kube-node-release    : It will store the object which is taken from one namespace to another
+kube-public        : All Public objects are stored here, generally namespace are private, if you want common public namespace
+kube-system        : By default K8S will create some object, those are stored here
+
+
+Note: Every component of kubernetes cluster is going to create in the form of POD, All these PODS are stored in Kube-System Namespace
+
+-- kubectl get namespace/ns
+
+-- kubectl get pods
+
+-- kubectl describe pod   [ By default pods are created in default namespace]
+
+
+-- kubectl get pods -A  [This will list all pods from all namespaces]
+
+-- kubectl get pods --all-namespaces  [This can also be used to get all pods from all namespaces]
+
+-- kubectl get pods -n default [This will list pods wchich is in default namespace]
+
+-- kubectl get pods -n kube-node-release  -- no pods here
+
+-- kubectl get pods -n kube-public  -- no pods here
+
+-- kubectl get pods -n kube-system  [all kubeproxy, apiserver, controller, schedular pods are here]
+
+
+Lets create a pods in namespaces
+--------------------------------
+
+-- kubectl get ns
+
+-- kubectl create ns dev
+
+-- kubectl get ns
+
+Currently I am in default namespace, how to check
+
+-- kubectl config view   [ output doesn't show namespace,  if you don't see any namespace, this is default]
+
+-- kubectl config set-context --current --namespace=dev  [This is use to switch to move from another namespace]
+
+-- kubectl config view  [ Now this output show dev namespace ]
+
+-- kubectl get pods  [Now you are in dev namespace, now you cannot see any pods of other namespace]
+
+== create a new pods in this namespace
+
+-- kubectl run dev1 --image nginx
+-- kubectl run dev2 --image nginx
+-- kubectl run dev3 --image nginx
+
+-- kubectl get pods
+
+=== lets create few pods in PROD namespace
+------------------------------------------
+
+kubectl get ns
+
+kubectl create ns prod
+
+kubectl get ns
+
+kubectl config view  -- see the output, we are in dev
+
+kubectl config set-context --current --namespace=prod   --- now change the namespace to prod
+
+kubectl config view
+
+kubectl get po
+
+you are in prod namespace , but if you want to see from another namespace
+
+kubectl run prod1 --image nginx
+kubectl run prod2 --image nginx
+kubectl run prod3 --image nginx
+
+kubectl get po
+
+kubectl get po -n default
+kubectl get po -n dev
+kubectl get po -n prod
+
+kubectl delete pod dev1 -n dev   [Deleting the  pod dev2 in dev namespace]
+
+kubectl delete pod prod1 -n prod   [Deleting the  pod prod1 in prod namespace]
+
+kubectl delete pod --all : [To delete all pods in the namespace]
+
+If require: kubectl delete namespace <namespace-name>
+
+
+
+
+kops delete cluster --name reyaz.k8s.local --yes
+
+===============================
+Role-Based Access Control (RBAC)
+===============================
+
+Role-Based Access Control (RBAC) in Kubernetes is a method for regulating access to resources in a Kubernetes cluster based on the roles of individual users or service accounts.
+
+RBAC helps you define what actions (verbs like get, list, create, delete, etc.) can be performed on specific resources (like pods, services, deployments, etc.) within specific namespaces or across the cluster.
+
+Role: A set of permissions (rules) that are defined within a namespace. Roles are used to grant access to resources within a specific namespace.
+
+RoleBinding: Grants the permissions defined in a Role to a user or service account within a specific namespace.
+
+Authentication(who are you?) and Authorization (what can you do?)
+
+Users vs Service Accounts
+==========================
+Before setting up RBAC, it’s important to understand the Kubernetes user model. There are two ways to create “users” depending on the type of access that’s required:
+
+Users —
+------
+In Kubernetes, a User represents a human who authenticates to the cluster using an external service. You can use private keys (the default method), a list of usernames and passwords, or an OAuth service such as Google Accounts. Users are not managed by Kubernetes; there is no API object for them so you can’t create them using Kubectl. You must make changes at the external service provider.
+
+Service Accounts —
+-------------------
+Service Accounts are token values that can be used to grant access to namespaces in your cluster. They’re designed for use by applications and system components. Unlike Users, Service Accounts are backed by Kubernetes objects and can be managed using the API.
+
+
+
+Assume authentication has been done on the kubernetes cluster by company with user jack, Let use give permissions to him to cluster only to get, list and watch
+
+Create a namespace in kubernetes
+
+-- kubectl create ns dev [use if already exits]
+
+-- kubectl config set-context --current --namespace=dev
+
+First create a sample serviceaccount here in kubernetes called jack
+
+Create a Serviceaccount ---> Create a ROLE(give permissions) --->  Role Binding
+
+vi serviceaccount.yml
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jack
+  namespace: dev
+
+-- kubectl create -f serviceaccount.yml
+
+--------------------------------------------------------------
+
+Create a Role within the dev namespace that allows the user jack to perform certain actions on pods:
+
+vi role.yml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: dev-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+
+-- kubectl create -f role.yml
+
+Since pods belong to the core API group, we use apiGroups: [""]
+
+
+------------------------------------------------------------------
+
+Next, bind the pod-reader Role to a user or service account. For simplicity, we'll bind it to a service account named jack:
+
+This RoleBinding binds the pod-reader Role to the jack user, allowing that user to get, list, and watch pods in the dev namespace.
+
+vi rolebinding.yml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: dev
+subjects:
+- kind: User
+  name: jack
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: dev-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+
+-- kubectl create -f rolebinding.yml
+
+
+Verifying Access
+-----------------
+To verify that the jack user has the correct permissions, you can impersonate the user using kubectl:
+
+-- kubectl auth can-i list pods --namespace=dev --as=jack   [answer yes]
+
+-- kubectl auth can-i create pods --namespace=dev --as=jack  [answer no]
+
+
+-- kubectl get roles -n dev    [List all roles in a namespace:
+
+
+-- kubectl describe rolebinding read-pods -n dev
+
+For more depth
+-----------------
+https://spacelift.io/blog/kubernetes-rbac
+
+
+=====================
+DAEMONSET
+======================
+
+✔️ DaemonSets ensure one pod per node for system-level services.
+✔️ Used for monitoring, logging, networking, and security.
+✔️ Automatically adds/removes pods when nodes join/leave the cluster.
+
+
+If you want to deploy only 1 pod per 1 node use DAEMONSET
+it is a old version of Deployment
+
+First delete existing deployment
+
+-- kubectl get deploy
+
+-- kubectl delete deploy mobilebanking-rs
+
+-- kubectl get pods
+
+
+in the below yml , only change is kind: DaemonSet (Capital D and S) and remove Replica
+
+vi daemon.yml
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: mb-daemon
+  labels:
+    app: bank
+spec:
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/mb-image:latest
+
+
+In the above manifest, we didn't mentioned any replicas, but daemonset will create one pod per node for sure.
+
+-- kubectl create -f daemon.yml
+
+-- kubectl get po
+
+
+It shows 2 pods, because DaemonSet will create 1 pod per 1 node, so 2 nodes, 1 pod each
+
+-- kubectl get daemonset
+
+-- kubectl get daemonset --namespace=default  [show daemonset in particular namespace]
+
+-- kubectl delete daemonset <daemonset-name> --namespace=<namespace>
+
+-- kubectl delete daemonset mb-daemon --namespace=default
+
+-- kubectl get daemonset
+
+tip:
+
+-- kubectl delete daemonset --all --namespace=default  [to delete all daemonsets in namespace default]
+
+
+==============================================================================================================================
+
+                                      
+
+=================================================================================================================================
+
+
+==========================
+SERVICES - if you want to expose the application
+=========================
+
+Services allow you to expose your applications running on Pods to other components within the cluster or to external users.
+
+Services provide a stable IP address and DNS name for the set of Pods, which might change over time due to scaling or updates
+
+Key Concepts of Kubernetes Services:
+----------------------------------
+
+ClusterIP:
+---------
+
+This is the default type of Service. It exposes the Service on a cluster-internal IP. Other services within the same Kubernetes cluster can access the Service, but it is not accessible from outside the cluster.
+
+This creates a connection using an internal Cluster IP address and a Port.
+
+NodePort:
+---------
+
+This type of Service exposes the Service on each Node’s IP at a static port. A NodePort Service is accessible from outside the cluster by hitting the <NodeIP>:<NodePort>.
+
+When a NodePort is created, kube-proxy exposes a port in the range 30000-32767:
+
+TargetPort:
+-----------
+
+Pod Container port. Pod's container listens on applicationn port Ex: 80 or 8080, if you dont use this line, K8s will assign default 80 port
+
+
+LoadBalancer:
+-------------
+
+This Service type exposes the Service externally using a cloud provider’s load balancer. It is typically used in cloud environments like AWS, GCP, or Azure.
+
+A LoadBalancer is a Kubernetes service that:
+
+Creates a service like ClusterIP
+Opens a port in every node like NodePort
+Uses a LoadBalancer implementation from your cloud provider (your cloud provider needs to support this for LoadBalancers to work).
+
+
+
+-- kops get cluster
+
+-- kubectl get nodes
+
+-- kubectl get events  [This command is used to see all the cluster events]
+
+-- kubectl get svc   [By default kuberenets will create a default svc ]
+
+Let us create a new service
+
+vi service.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ib-service
+spec:
+  type: ClusterIP
+  selector:
+    app: bank
+  ports:
+    - port: 80        # Exposes the service on port 80
+      targetPort: 80  #  Pod's container listens on 80, if you dont use this line, K8s will assign default 80 port
+
+
+How Traffic Flows
+------------------
+Client connects to ib-service:80
+Service forwards request to the Pod’s container at 8080 if 80 (because targetPort: 8080 / 80)
+The container in the Pod listens on 8080 / 80 and processes the request.
+
+targetport = Pod's container
+nodeport = Node's external port
+
+
+-- kubectl create -f service.yml    [To create deployment]
+
+-- kubectl get pods  [To get the list of the pods]
+
+-- kubectl get svc   [Get the list of services created]
+
+-- kubectl get pods -o wide  [Get the pods details ]
+
+-- kubectl describe svc ib-service  [Get the detailed description of service]
+
+===== This has clusterIP service, but  cannot exposed to internet, use this for databases which should be in private
+
+-- kubectl delete -f service.yml    [ This will delete service and deployment ]
+
+
+
+===============
+NodePort
+===============
+
+IT will expose our application in a particular port
+
+Range 30000 - 32767 (in SG, we need to give all traffic)
+
+if we don't specify any port K8s will pick randomly
+
+
+vi service.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/mb-image:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mb-service
+spec:
+  type: NodePort   # Type Nodeport, but if you dont mention port number under ports section, K8s will assign random port
+  selector:
+    app: bank
+  ports:
+    - port: 80
+      targetPort: 80  # Ensure this matches the container's port, if you dont use this line, K8s will assign default 80 port
+
+
+-- kubectl apply -f service.yml  [Can use create to create new resources , update is used to update on existing resources]
+
+-- kubectl describe svc mb-service
+
+-- kubectl get svc  [ See the output, it shows nodeport, port number is random ]
+
+Now http://IP:portnumber  it will not work as K8s will create a new vpc and SG, allow all traffic in new SG(nodes.reyaz.k8s.local)
+    Custom TCP = 31433 , custom=anywhere
+        All traffic , custom = anywhere
+
+==== if you want your own customized port , just edit the before file
+
+vi service.yml
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/mobilebankingrepo:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mb-service
+spec:
+  type: NodePort
+  selector:
+    app: bank
+  ports:
+    - port: 80
+      targetPort: 80  # Ensure this matches the container's port, if you dont use this line, K8s will assign default 80 port
+      nodePort: 31433  # External access via <NodeIP>:31234 Must be in range 30000-32767
+
+
+Client accesses http://<NodeIP>:31234
+Traffic reaches Kubernetes Node on nodePort: 31234
+The service forwards it to port: 80 (internal Service port)
+Then it forwards the request to targetPort: 80 (inside the Pod’s container)
+
+
+-- kubectl apply -f service.yml   [ we can update existing deployment ]
+
+create vs apply : create will create new resources, apply for updating existing resources
+
+-- kubectl describe svc mb-service
+
+-- kubectl get svc
+
+http://IP:31433
+
+
+Drawback of nodeport : we should not give IP and port number to customer, he is not interested
+----------------
+
+====================================================================
+LoadBalancer - it will expose our app to customer using URL, map in R53
+====================================================================
+
+first delete the deployment
+
+-- kubectl delete -f service.yml
+
+
+vi service.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insurance-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/insurance-image:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mb-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: bank
+  ports:
+    - port: 80
+      targetPort: 80  # Ensure this matches the container's port, if you dont use this line, K8s will assign default 80 port
+      nodePort: 31433 # If you dont mention target and nodeports, K8s will generate random nodeport and target port 80
+
+
+-- kubectl create -f service.yml
+
+-- kubectl describe svc mb-service
+
+-- kubectl get svc  [Grab the elb, and see in AWS Console : ELB, Target Group. Wait for sometime to come InService]
+
+-- kubectl delete -f service.yml [if required]
+
+Exploring Task
+----------------------
+
+Kubernetes Dashboard
+
+============================================
+
+Kubernetes Metric Server  - also called Heapster
+
+=============================================
+
+It's a scalable, efficient source for monitoring the overall health and performance of a Kubernetes cluster, providing the data needed for Kubernetes features like Horizontal Pod Autoscaler (HPA) and the Kubernetes Dashboard.
+
+Key Features:
+============
+
+Resource Metrics:
+----------------
+Collects CPU and memory usage metrics from the kubelets and provides aggregated metrics at the node and pod level.
+
+Autoscaling:
+------------
+Enables features like the Horizontal Pod Autoscaler (HPA), which automatically adjusts the number of pods in a deployment based on observed CPU or memory utilization.
+
+Kubernetes Dashboard:
+---------------------
+The Metrics Server provides the resource usage data displayed in the Kubernetes Dashboard.
+
+How Metrics Server Works:
+-------------------------
+
+Kubelets:
+--------
+Each node in a Kubernetes cluster runs a kubelet that periodically collects resource usage statistics from the node and the containers running on it.
+
+Metrics Server:
+-------------
+The Metrics Server collects these metrics from the kubelets and stores them in memory, aggregating them to be accessed by other components (like the HPA).
+
+
+In Short
+========
+
+This metric server in K8S will collect metrics information like cpu, ram etc for all pods and nodes in the cluster
+
+A single deployment that works on most clusters , collect metrics every 15 secs
+
+We can use kubectl top po/no to see the metrics
+
+-- kubectl top po/no   [ Will not work, as we don't have metric server configured ]
+
+Install Metric Server
+---------------------
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+
+kubectl top pods     [ Wait for 2 mins ]
+
+kubectl top nodes/no
+
+========================
+Auto-Scaling
+========================
+
+HPA - Horizontal Pod Autoscaling - Scales the number of pods based on CPU/memory utilization or custom metrics.
+--------------------------------
+
+VPA  - Vertical Pod Autoscaling - Adjusts the CPU/memory requests/limits of a pod dynamically to improve resource allocation. you'll need to  
+--------------------------------  install the VPA components in your Kubernetes cluster, as it is not included by default.
+                                  Install the VPA Custom Resource Definitions (CRDs) seperately
+
+
+In K8S , a HPA automatically updates a workload resource (such as Deployment or ReplicaSet) based on demand.
+
+Give the value example 70%, if going more than 70% scale out and less than it will do Scale In
+
+Metric server will do the major role here as it will collects metrics , based on the value scale out and scale in happens
+
+Before scale In, process will wait for few mins to scale in to complete the traffic requests
+this is called COOLING PERIOD
+
+In Kubernetes, the cooling period for the Horizontal Pod Autoscaler (HPA) is the amount of time the HPA waits after a scale event before triggering another scale event.
+
+Scaling can be done only for Scalable Objects(Ex RS, Deployment and RC Replication Controller)
+
+Side note:  Replication Controller(RC), A Replication Controller in Kubernetes is an older mechanism used to ensure that a specified number of pod replicas are running at any given time. Now it is replaced with ReplicaSet
+
+vi auto.yml
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mb-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/mobilebankingrepo:latest
+
+
+-- kubectl create -f auto.yml
+
+-- kubectl get pods
+
+-- kubectl top pods
+
+Now lets stress the pods
+
+-- kubectl autoscale deployment mb-deployment --cpu-percent=20 --min=1 --max=10
+
+Autoscale deployment called mb-deployment if my cpu is more than 20%, scale out, min 1 , max 10
+
+-- kubectl get hpa    [ This wil show cpu: 1% / 20% , now cpu percent is 1%, it will take time ]
+
+Now lets stress the pod by installing stress inside pod, lets connect to pod using exec and install stress
+
+-- kubectl get pods
+
+-- kubectl exec -it mb-deployment-8585b755c5-c6fb7 -- /bin/bash
+
+         -- apt update
+         -- apt install stress
+         -- stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 60s
+         -- exit
+
+--cpu 8: Launches 8 CPU stressors, each consuming 100% CPU by performing continuous computations.​
+--io 4: Initiates 4 I/O stressors, each generating continuous I/O operations to stress the system's disk and filesystem.​
+--vm 2: Starts 2 virtual memory stressors, each allocating and deallocating memory repeatedly to test the system's memory management.​
+--vm-bytes 128M: Specifies that each virtual memory stressor should allocate 128 megabytes of memory.​
+--timeout 60s: Sets the duration of the stress test to 60 seconds, after which all stressors will terminate.
+
+
+
+
+open another terminal to watch the live pods
+
+-- kubectl get po --watch
+
+On main server
+
+-- kubectl top pods
+
+-- kubectl get hpa
+
+-- kubectl get pods
+
+-- kubectl describe hpa mb-deployment     [ This will show scaling activities ]
+
+-- kubectl get events   [ This will also show same things ]
+
+-- kubectl logs mb-deployment-8585b755c5-p2bzv   [ To see logs of the pod ]
+
+After few mins, scale in happens as we dont have load.
+
+-- kubectl delete -f auto.yml
+
+Example using Manifestfile
+--------------------------
+
+First we need to have deployment and then we can autscale on that deployment / deployment name
+
+vi auto.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+
+
+-- kubectl apply -f auto.yml
+
+--------------------------------
+
+vi hpa.yml
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ib-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ib-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 20
+
+
+scaleTargetRef specifies the target deployment (ib-deployment) for scaling
+
+
+-- kubectl apply -f hpa.yml
+
+Open another tab --> kubectl get pods --watch
+
+-- kubectl get hpa
+
+-- kubectl get pods
+
+-- kubectl exec -it mb-deployment-8585b755c5-c6fb7 -- /bin/bash
+
+         -- apt update
+         -- apt install stress
+         -- stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 60s
+         -- exit
+
+-- kubectl get hpa
+
+
+Note: if you want to delete metric server , just instead apply, use delete
+
+kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+
+
+===========================
+Resource Quota
+===========================
+
+
+K8S cluster can be divided into namespaces
+By default the pods in K8s will run with no limitation of Memory and CPU
+WE need to give the limit for the pod
+IT can limit the objects that can be created in a namespace and total amount of resources
+pod schedular in master will check the worker nodes on cpu and memory and create a pod in it
+we can set limits to CPU, Memory and storage
+CPU is measrured on Cores and memory on Bytes
+1CPU = 1000 milliCPUs
+
+Requests = how much we want
+Limit = how much max we want
+
+limits can be given to pod and nodes also
+the default limit is 0
+
+if you mention request and limit everthing will work fine
+if you dont mention request and mention limit then Request = limit
+if you dont mention request dont mention limit , Request ! = limit
+
+Every pod in the namespace must have CPU limit, no need to mention memory, if you dont mention cpu, pod will take all cpu
+The amount of CPU used by all pods inside namespace must not exceed specified limit
+
+-- kubectl create ns dev
+
+-- kubectl config set-context --current --namespace=dev
+
+-- kubectl config view  [To see which namespace we are using]
+
+vi dev-quota.yml
+
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "5"
+    limits.cpu: "1"
+    limits.memory: 1Gi
+
+
+Pods: A maximum of 5 pods can be created.​
+CPU Limits: The total CPU limit across all containers is restricted to 1 CPU.​
+Memory Limits: The total memory limit across all containers is capped at 1 GiB.
+
+
+-- kubectl create -f dev-quota.yml
+
+-- kubectl get quota
+
+NAME        AGE   REQUEST     LIMIT
+dev-quota   69s   pods: 0/5   limits.cpu: 0/1, limits.memory: 0/1Gi
+
+
+-- kubectl run pod1 --image=nginx  [ This will not work because, we need to mention quota for dev namespace as we are in that ns
+                                     we can put --cpu and --memory in the command or use manifest file ]
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/internetbankingrepo:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+
+-- kubectl create -f deploy.yml
+
+-- kubectl get pods  [It has created only 1 pod, as we mention replica = 3 , this is due to restriction we made for this namespace dev]
+
+In the above manifest file, we are mentioning cpu 1 and memory 512 for each pod, but in name space dev we have restricted to 1cpu and 1GB memory, if you run kubectl create -f deploy.yml , it will create only 1 pod because of restriction, if you want all 3 pods put cpu as 0.3 ad 300Mi, it will create all- to do this kubectl delete -f deploy.yml and recreate it
+
+-- kubectl delete -f deploy.yml
+
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/internetbankingrepo:latest
+          resources:
+            limits:
+              cpu: "0.3"
+              memory: 300Mi
+
+
+-- kubectl create -f deploy.yml
+
+-- kubectl get po
+
+-- kubectl get quota
+
+-- kubectl delete -f deploy.yml
+
+========================================================================================================================
+
+======================
+PV - Persistent Volume
+======================
+
+Stateless : if i delete pod data is lost, because data is stored locally on the pod and instance
+----------
+Stateful: if i delete the pod data is persistent, because we can store the data in external storage like AWS EBS
+---------
+
+Kubernetes Persistent Volumes (PVs) provide a way to manage durable storage for applications running in a Kubernetes cluster.
+----------------------------------
+Unlike ephemeral storage tied to the lifecycle of a pod, Persistent Volumes exist independently of pods and remain intact even after pods are deleted.
+
+This makes PVs ideal for stateful applications that require persistent storage, such as databases
+
+
+Persistent meaning permanent
+
+PV are independent they can exists even if no pod is using them
+
+It is created by administrator or dynamically created by storage class
+
+Once a PV is created , it can be bound to a Persistent Volume Claim (PVC), which is a request for storage by a pod
+
+When a pod requests storage via PVC , K8S will search for a suitable PV to satisfy the requests
+
+PV is bound to the PVC and the pod can use the storage
+
+If no suitable PV is found, K8S will either dynamically create a new one (if the storage class support dynamic provisioning ) or the PVC will remain unbound
+
+PV will maintain total storage , PV Is bound to PVC
+Pods will ask PVC, PVC will get from PV
+
+
+PVC
+===
+
+TO use PV we need to claim the volume using PVC
+PVC request a PV with your desired specification(size, access, modes & speed etc) from K8S and once a suitable PV is found it will bound to PVC
+
+After bounding is done to pod you can mount is as a volume
+
+Once user finished work, the attached PV can be released the underlying PV can be reclaimed and recycled for future
+
+if you create volume in cluster , if cluster is delete , storage is also deleted. SO use AWS EBS Volumes
+
+
+First, create a EBS volume in EC2, with 10GB magnetic
+
+
+-- kubectl delete ns dev   [delete the namespace and come to default]
+-- kubectl config set-context --current --namespace=default
+
+vi pv.yml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: vol-0771f0561f66408c9
+    fsType: ext4
+
+-- kubectl create -f pv.yml
+
+-- kubectl get pv
+
+
+----------------------------------------------------------------
+
+--- Now create pvc
+
+vi pvc.yml
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+
+-- kubectl create -f pvc.yml
+
+-- kubectl get pv   [ This will show pv and pvc both ]
+
+Note: kubectl get pvc is showing in pending state, because we need to create a new pods to consume first. kubectl get events -- see logs
+
+--Now lets setup a statefull application, statefull meaning, it will keep the previous data
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: centos
+        command: ["/bin/bash", "-c", "sleep 10000"]
+        volumeMounts:
+        - name: my-pv
+          mountPath: "/tmp/persistent"
+      volumes:
+        - name: my-pv
+          persistentVolumeClaim:
+            claimName: my-pvc
+
+
+-- kubectl create -f deploy.yml
+
+-- kubectl get pods
+
+Now lets go inside container to see the volume mount
+
+-- kubectl exec -it podid-dfgdkjjf -- /bin/bash
+
+-- cd /tmp
+
+-- ls
+
+-- cd persistent
+
+-- touch file{1..5}
+vi file1
+this is from pod-1 pv
+
+exit
+
+-- kubectl get pods
+
+lets delete the pod now, if we delete the pod, a new pod will be created automatically , data will not get deleted as it is in the persistent volume
+
+-- kubectl delete pods podid-rfgdfdjg
+
+-- kubectl get pods   [ you have a new pod ]
+
+--kubectl exec -it podid-dfdgh435 -- /bin/bash
+
+or
+
+-- kubectl exec -it podid-dfdgh435-- ls /tmp/persistent
+
+cd /tmp/persistent
+ls
+we can see the same data
+
+exit
+
+This is stateful
+
+=======================================================
+
+If you want to increase the size, increase EBS volume to 25
+
+kubectl describe pv  [ Capacity is shows 10gb only ]
+
+vi pv.yml
+in storage change to 20Gi
+
+kubectl apply -f pv.yml
+
+kubectl describe pv
+
+kubectl delete -f .   [Delete all deployments]
+
+================================================================================================================
+
+ENV VARIABLES:
+---------------
+It is a way to pass configuration information to containers running within pods. To set Env vars it include the env or envFrom field in the configuration file.
+
+ENV: Allows you to set environment variables for a container, specifying a value directly for each variable through CLI/ Command prompt
+----
+ENVFROM: PASSING Variables FROM FILE - 2 Types, configmaps and secrets
+------
+
+CONFIGMAPS
+--------------------
+It is used to store the data in key-value pair, files, or command-line arguments that can be used by pods, containers in cluster.
+But the data should be non-confidential. It does not provide security and encryption
+If you want to provide Enryption use Secrets in K8S.
+
+Limit of the configmap is only 1MB
+
+But if you want to store more than 1MB configmap data mount volume or use a separate database or a file service
+
+Example with ENV
+----------------
+
+-- kubectl create deploy newdb --image=mariadb         [ This will create a deployment called newdb with single pod having mariadb]
+
+-- kubectl get pods
+
+-- kubectl logs newdb-794dd57dbc-tr7s9   [It is crashed because we haven't specified the passsowrd for MariaDB]
+
+-- kubectl set env deploy newdb MYSQL_ROOT_PASSWORD=root123456
+
+-- kubectl get pods  [ Now it will be in running state, but we are passing password directly from command ]
+
+-- kubectl delete deploy newdb
+
+
+
+Pod State : ImagePullBackOff:
+----------------------------
+When a kubelet starts creating containers for a Pod using a container runtime, it might be possible the container is in Waiting state because of ImagePullBackOff.
+
+The status ImagePullBackOff means that a container could not start because Kubernetes could not pull a container image for reasons such as
+
+Invalid image name or
+Pulling from a private registry without imagePullSecret.
+The BackOff part indicates that Kubernetes will keep trying to pull the image, with an increasing back-off delay.
+
+Kubernetes raises the delay between each attempt until it reaches a compiled-in limit, which is 300 seconds (5 minutes).
+
+
+Pod State: CrashLoopBackOff
+---------------------------
+
+When you see "CrashLoopBackOff," it means that kubelet is trying to run the container, but it keeps failing and crashing. After crashing, Kubernetes tries to restart the container automatically, but if the container keeps failing repeatedly, you end up in a loop of crashes and restarts, thus the term "CrashLoopBackOff."
+
+
+
+Passing from Var file
+--------------------
+
+-- kubectl create deploy newdb --image=mariadb
+
+-- kubectl get pods
+
+-- kubectl logs newdb-794dd57dbc-f44f2
+
+This will not work because haven't specified the password, in above example we have passed password using ENV but lets use now ENVFROM
+
+--> create a file called vars
+
+vi vars
+
+MYSQL_ROOT_PASSWORD=root123456
+MYSQL_USER=admin
+
+lets use configmap and create configmap called dbvars
+
+-- kubectl create cm dbvars --from-env-file=vars  [It will create a configmap called dbvars using var file we created]
+
+--kubectl get cm
+
+-- kubectl describe cm dbvars
+
+This will show the plain data
+
+
+Now we just created a configmap called dbvars, using this lets deploy our pods
+
+-- kubectl get cm
+
+-- kubectl set env deploy newdb --from=configmaps/dbvars
+
+-- kubectl get pods
+
+we can give configmaps also in manifest file
+
+-- kubectl get cm
+
+-- kubectl delete deploy newdb
+
+SECRETS:
+--------
+
+SECRETS: To store sensitive data in an unencrypted format like passwords, ssh-keys etc it uses base64 encoded format
+password=reyaz (now we can encode and decode the value)
+
+WHY: if i dont want to expose the sensitive info so we use SECRETS
+
+By default k8s will create some Secrets these are useful from me to create communicate inside the cluster used to communicate with one resource to another in cluster
+
+These are system created secrets, we need not to delete
+TYPES:
+Generic: creates secrets from files, dir, literal (direct values)
+TLS: Keys and certs
+Docker Registry: used to get private images by using the password
+
+
+
+-- kubectl create deploy newdb --image=mariadb
+
+-- kubectl get pods  [This will fail because no env variable]
+
+first create secrets , 2 ways to create, from CLI or from File
+
+-- kubectl create secret generic password --from-literal=ROOT_PASSWORD=reyaz123 (from cli)  --- literal meaning direct value
+
+-- kubectl create secret generic my-secret --from-env-file=vars (from file)
+
+-- kubectl get secrets
+
+-- kubectl describe secret my-secret [Name of the secret is my-secret ]
+
+-- kubectl set env deploy newdb --from=secrets/my-secret
+
+-- kubectl get pods  [This will fail because we have not mention the MYSQL_ prefix]
+
+-- kubectl set env deploy newdb --from=secret/my-secret --prefix=MYSQL_
+
+without passing prefix we cant make the pod running status
+
+TO SEE SECRETS:
+-------------
+-- kubectl get secrets password -o yaml
+
+-- echo -n "LKJSKFHJHi" | base64 -d
+or
+-- echo -n "LKJSKFHJHi" | base64 --decode
+
+
+-- kubectl delete deploy newdb
+
+=====================================================================================================================================================
+
+===================
+SIDE CAR:
+===================
+
+It creates a helper container to main container.
+main container will have application and helper container will do help for main container.
+
+Adapter Design Pattern:
+----------------------
+standardize the output pattern of main container.
+
+Ambassador Design Pattern:
+-------------------------
+used to connect containers with the outside world
+
+Init Container:
+--------------
+it initialize the first work and exits later.
+
+​A sidecar container is a secondary container that runs alongside the main application container within the same Kubernetes Pod. This design pattern allows you to extend or enhance the functionality of the main application without modifying its code. Common use cases include log aggregation, data synchronization, and proxying network traffic.​
+
+
+Example: Log Aggregation with a Sidecar Container
+-------------------------------------------------
+Below is a YAML configuration for a Pod that demonstrates the sidecar pattern. In this example, the main application container writes log data to a shared volume, and the sidecar container serves these logs over HTTP using Nginx
+
+vi sidecar.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-aggregator-pod
+spec:
+  containers:
+    - name: app-container
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["while true; do date >> /var/log/app.log; sleep 5; done"]
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log
+    - name: sidecar-container
+      image: nginx
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+
+
+
+Explanation:
+------------
+Main Application Container (app-container):
+------------------------------------------
+Uses the alpine image, a minimal Docker image based on Alpine Linux.​
+Executes a shell command that appends the current date and time to /var/log/app.log every five seconds.​
+Mounts a shared volume at /var/log to store log data.​
+
+Sidecar Container (sidecar-container):
+------------------------------------
+Uses the nginx image to serve content over HTTP.​
+Mounts the same shared volume at /usr/share/nginx/html, which is the default directory Nginx serves files from.​
+As a result, Nginx serves the app.log file, allowing access to the application's log data via HTTP.​
+
+Shared Volume (shared-logs):
+-----------------------------
+An emptyDir volume that is created when the Pod is assigned to a node and exists as long as the Pod is running.​
+Provides a shared storage space accessible to both containers for log data.​
+
+
+-- kubectl apply -f sidecar.yaml
+
+-- kubectl get pods
+
+-- kubectl describe pods
+
+-- kubectl exec -it log-aggregator-pod -c sidecar-container -- sh
+
+        cd /usr/share/nginx/html
+        cat app.log
+
+we can see app.logs which is generated in app-container but can be accessed from side-car container using shared volumes
+
+-- kubectl delete -f sidecar.yml
+
+===================
+INGRESS
+===================
+
+Ingress is a service to expose application, but we already have cluster ip, node port and load balancer , let see
+
+Ingress helps to expose HTTP and HTTPS routes from outside of the CLuster
+Ingress supports Host based routing and path based routing
+ingress supports load balancing and SSL termination
+IT redirect the incoming requests to the right services based on the web url or path in the address
+ingress provides encryption feature and helps to balance the load of the applications
+
+Explain Host based and Path based
+-----------------------------------
+Host Based Routing: ex: boom.com, web.boom.com, admin.boom.com
+Path based routing: boom.com/hello , boom.com/admin, Paytm.com/movies, Paytm.com/recharge etc
+
+but services like load balancer, cluster ip, node port etc donest have these features
+
+General load balancer routes the traffic based on ports and cant handle URL based routing
+
+kubectl get ing --> shows ingress service , no ingress service
+
+To install ingress, firstly we have to install nginx ingress controller:
+command:
+
+-- kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+
+kubectl get pods
+kubectl get deploy
+kubectl get svc
+kubectl get ingress
+kubectl get service
+
+
+if required
+-----------
+kubectl delete svc internetbanking
+kubectl delete svc mobilebanking
+kubectl delete deploy internetbanking
+
+
+
+
+------------------------------------------------
+
+vi httpd.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "APACHE APP2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: httpd
+
+----------------------------------------
+
+vi nginx.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "NGINX APP1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: nginx
+
+
+------------------------------------
+
+
+
+
+vi ingress.yml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8s-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /nginx(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+          - path: /httpd(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: httpd
+                port:
+                  number: 80
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+
+----------------------------------------------------
+
+kubectl apply -f httpd.yml
+
+kubectl apply -f nginx.yml
+
+kubectl apply -f ingress.yml
+
+
+-- kubectl get deploy
+-- kubectl get svc
+-- kubectl get pods
+-- kubectl get ingress
+
+-- kubectl get services ingress-nginx-controller --namespace=ingress-nginx
+
+
+
+Allow All traffic in node security group
+
+Take the ELB and put in the browser http://elb/nginx and http://elb/httpd
+
+
+
+Now update vi httpd.yml --> image to trainerreyaz/wordcounter
+update vi nginx.yml --> image to trainerreyaz/ib-image:latest
+
+-- kubectl apply -f httpd.yml
+
+-- kubectl apply -f nginx.yml
+
+-- kubect get pods
+
+http://elb/nginx
+http://elb/httpd
+
+
+-- kubectl delete services ingress-nginx-controller --namespace=ingress-nginx
+
+
+Key Components:
+===============
+Annotations:
+------------
+nginx.ingress.kubernetes.io/ssl-redirect: "false": Disables automatic redirection from HTTP to HTTPS.​
+nginx.ingress.kubernetes.io/use-regex: "true": Enables the use of regular expressions in path matching. ​
+nginx.ingress.kubernetes.io/rewrite-target: /$2: Rewrites the matched URI to the specified target.​
+
+Rules:
+------
+Traffic matching /nginx, optionally followed by a / or end of the string, and any subsequent characters ((.*)), is directed to the nginx service.​
+Traffic matching /httpd, following the same pattern, is directed to the httpd service.​
+All other traffic (/(.*)) is directed to the nginx service.​
+Considerations:
+
+Path Matching:
+-------------
+The pathType: ImplementationSpecific allows the Ingress controller to interpret the path matching rules, including regular expressions. Ensure that your Ingress controller supports this path type and regex patterns.
+ ​
+Rewrite Target:
+---------------
+The nginx.ingress.kubernetes.io/rewrite-target: /$2 annotation rewrites the incoming request path to the specified target before forwarding it to the backend service. Ensure that this behavior aligns with your application's routing logic.
+
+=================================================================================================================
+
+
+
+PODS SCHEDULING
+===============
+
+In Kubernetes, Node Selector,Node Affinity,  Taints and Tolerations and are mechanisms that influence how Pods are scheduled onto Nodes within a cluster.
+
+Node Selector
+Node Affinity
+Taints and Tolerations
+
+1. Node Selector
+------------------
+NodeSelector is the simplest form of node selection constraint, allowing Pods to be scheduled only on Nodes with specific labels. By specifying a NodeSelector in a Pod's specification, you can ensure that the Pod runs only on Nodes that match the given label criteria.
+NodeSelector: Use when you have simple, specific constraints for Pod placement based on Node labels
+
+In the below manifest file, we are creating 2 pods and those pods should be scheduled in ib-node labeled node.
+
+vi nodeselector.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      nodeSelector:
+        node-name: ib-node
+      containers:
+      - name: cont1
+        image: reyadocker/internetbankingrepo:latest
+
+
+-- kubectl apply -f nodeselector.yml
+
+-- kubectl get pods   --- Pods are not getting created because there is no label to the node called node-name: ib-node
+
+-- kubectl describe pod ib-deployment-7784c9bfb5-8sl8d  
+
+     Warning  FailedScheduling  2m40s  default-scheduler  0/3 nodes are available: 1 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 2 node(s) didn't match Pod's node affinity/selector. preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling.
+
+-- kubectl get nodes
+
+-- kubectl edit node i-043783332483bf9f8
+
+      under labels add  --- node-name: ib-node / We can use command also "kubectl label nodes i-043783332483bf9f8 node-name=ib-node "
+
+
+-- kubectl get pods  -- Now pods are running
+
+we are forcing kube-schedular to schedule pod on particular node. Its hard match. If it doesn't match, Kube scheduler will not schedule the pod
+so pod will be in pending state    
+
+-- kubectl delete deploy ib-deployment
+
+2: Node Affinity
+================
+Node Affinity is a more expressive way to specify rules about the placement of pods relative to nodes' labels. It allows you to specify rules that apply only if certain conditions are met. Same as Node Selector but this has flexible way, if matches do it, if not schedule pod on any another node.
+
+Two types
+----------
+1.Preferred during scheduling Ignore during execution (soft rules) : good if happen
+2.Required during scheduling Ignore during execution (hard rules) : Must happen  : Same as NodeSelector
+
+The node affinity syntax supports the following operators: In, NotIn, Exists, DoesNotExist, Gt, Lt, etc.
+
+
+Preferred:
+---------
+
+vi preferred.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      affinity:
+       nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+           matchExpressions:
+           - key: node-name
+             operator: In
+             values:
+             - mb-node
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+weight: 1: Indicates the preference weight. Higher values signify stronger preferences.​
+
+
+
+we haven't set the label for another node as node-name: mb-node
+
+-- kubectl apply -f preferred.yml
+
+-- kubectl get pods  --> 1 pod running. Why ? even i mention node-name: mb-node, No node has this label yet, but as we used preferred configuration, scheduler has scheduled on other nodes.
+
+-- kubectl get pods -o wide   --> note down node-id , it might show on same node, but scheduler has choosen
+
+-- kubectl delete deploy ib-deployment
+
+-- vi preffered.yml
+
+   change node-name: ib-node
+
+-- kubectl apply -f preferred.yml
+
+-- kubectl get pods -o wide  --- it should schedule on actual labeled node
+
+-- kubectl delete -f preferred.yml
+
+Required
+========
+
+vi required.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      affinity:
+       nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: node-name
+             operator: In
+             values:
+             - mb-node
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+-- kubectl create -f required.yml
+
+-- kubectl get pods -o wide   [Pod are not running, it is in pending state because, required is mb-node, but no node has mb-node]
+
+-- kubectl delete -f required.yml
+
+TAINTS and TOLERANCE
+====================
+
+In Kubernetes, taints and tolerations work together to control the scheduling of Pods onto Nodes. Taints are applied to Nodes to prevent certain Pods from being scheduled on them, while tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints. ​
+
+Example Scenario: Dedicated Nodes for Specific Workloads
+---------------------------------------------------------
+Suppose you have a Kubernetes cluster with Nodes equipped with specialized hardware, such as GPUs, intended exclusively for machine learning workloads. To ensure that only Pods requiring GPU resources are scheduled on these Nodes, you can use taints and tolerations.
+
+
+-- kubectl edit node i-0e6b67bf1b00383be  [Edit control plane, this master node has taint no schedule, thats the reason master node will not have pods ]
+
+Apply a Taint to GPU Nodes
+--------------------------
+
+First, taint the GPU Nodes to repel/force Pods that do not require GPU resources:
+
+-- kubectl get nodes
+
+-- kubectl taint nodes i-0333b24c25bf4868b hardware=gpu:NoSchedule
+
+This command adds a taint with key hardware, value gpu, and effect NoSchedule to the specified Node. As a result, Pods without a matching toleration will not be scheduled on this Node.
+
+
+Lets test:
+-------
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/internetbankingrepo:latest
+
+
+-- kubectl create -f deploy.yml
+
+-- kubectl get pods -o wide  [all pods are scheudled on another node]
+
+Add a Toleration to GPU-Requiring Pods
+--------------------------------------
+
+Next, add a toleration to the Pods that require GPU resources, allowing them to be scheduled on the tainted Nodes:
+
+vi deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+        - name: cont1
+          image: reyadocker/internetbankingrepo:latest
+      tolerations:
+        - key: "hardware"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+
+
+In this Pod specification, the toleration matches the taint applied to the GPU Nodes, permitting the Pod to be scheduled on those Nodes.
+
+
+Key Points:
+----------
+Taints are applied to Nodes to repel certain Pods. They consist of a key, value, and effect (NoSchedule, PreferNoSchedule, or NoExecute). ​
+
+Tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints. They must match the key, value, and effect of the taint to be effective.
+
+
+Pod Affinity
+=============
+Pod affinity allows users to specify which pods a pod should or should not be scheduled with based on labels. For example, you can use pod affinity to specify that a pod should be scheduled on the same node as other pods with a specific label, such as app=database.
+
+SUMMARY
+=======
+
+Taint should be used when you want to mark a node as unavailable for certain pods. For example, you can use taint to mark a node as "maintenance" and prevent pods from being scheduled on the node while it is undergoing maintenance.
+
+Node selector is a simpler and more primitive mechanism compared to node affinity and is sufficient for many use cases.
+
+Node affinity should be used when you want to specify which nodes a pod should or should not be scheduled on based on node labels. Node affinity provides more fine-grained control over pod scheduling compared to node selector and allows you to specify complex rules for pod scheduling based on multiple node labels.
+
+Pod affinity allows us to set priorities for which nodes to place our pods based off the attributes of other pods running on those nodes. This works well for grouping pods together in the same node.
+
+Pod anti-affinity allows us to accomplish the opposite, ensuring certain pods don’t run on the same node as other pods. We are going to use this to make sure our pods that run the same application are spread among multiple nodes. To do this, we will tell the scheduler to not place a pod with a particular label onto a node that contains a pod with the same label
+
+
+https://blog.devops.dev/taints-and-tollerations-vs-node-affinity-42ec5305e11a
+
+
+
+==================================================================================================================
+
+HELM:
+
+In K8S Helm is a package manager to install packages
+in Redhat: yum & Ubuntu: apt & K8s: helm
+
+it is used to install applications on clusters.
+we can install and deploy applications by using helm
+it manages k8s resources packages through charts
+chart is a collection of files organized on a directory structure.
+chart is collection of manifest files.
+a running instance of a chart with a specific config is called a release.
+The Helm client and library is written in the Go programming language.
+The library uses the Kubernetes client library to communicate with Kubernetes.
+
+
+ARCHITECURE:
+1. HEML REPOSITORY: IT HAS AL HELM REPOS WHICH IS PUBLICALLY AVAILABLE
+2. HEML CLIENT: DOWNLOADS HELM CHARTS FORM HELM REPOS.
+3. API SERVER: DOWNLOADED HELM CHARTS WILL BE EXECUTED ON CLUSTER WITH API SERVER.
+
+===========
+ARGOCD - to do deployment in K8S Cluster
+=========
+
+GitOps continuous delivery tool for Kubernetes
+
+It automates the deployment of applications to Kubernetes clusters,
+
+Pipeline is not the best method for K8s, use ARGOCD
+
+
+
+
+INTRO:
+ArgoCD is a declarative continuous delivery tool for Kubernetes. ArgoCD is the core component of Argo Project.
+It helps to automate the deployment and management of applications in a K8s cluster. It uses GitOps methodology to manage the application lifecycle and provides a simple and intuitive UI to monitor the application state, rollout changes, and rollbacks.
+With ArgoCD, you can define the desired state of your Kubernetes applications as YAML manifests and version control them in a Git repository.
+ArgoCD will continuously monitor the Git repository for changes and automatically apply them to the Kubernetes cluster.
+ArgoCD also provides advanced features like application health monitoring, automated drift detection, and support for multiple environments such as production, staging, and development.
+It is a popular tool among DevOps teams who want to streamline their Kubernetes application deployment process and ensure consistency and reliability in their infrastructure.
+
+
+Setup KOPS first and with the helm we will setup ARGOCD
+
+Setup KOPS
+
+Install HELM
+---------------
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+helm version
+
+Install ARGOCD using HELM
+---------------------------
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+kubectl create namespace argocd
+helm install argocd argo/argo-cd --namespace argocd
+kubectl get all -n argocd
+
+EXPOSE ARGOCD SERVER:
+--------------------
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+yum install jq -y
+
+//export ARGOCD_SERVER='kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname''
+
+//echo $ARGOCD_SERVER
+
+kubectl get svc argocd-server -n argocd -o json | jq --raw-output .status.loadBalancer.ingress[0].hostname
+
+The above command will provide load balancer URL to access ARGO CD
+
+
+TO GET ARGO CD PASSWORD:
+------------------------
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+
+
+export ARGO_PWD='kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d'
+
+echo $ARGO_PWD
+
+The above command to provide password to access argo cd
+
+
+Open ArgoCD load balancer
+
+username: admin and password from above command
+
+create app --> Application Name --> bankapp --> Project Name --> default --> Sync Policy --> Automatic --> Repository --> https://github.com/ReyazShaik/ar-deploy.git --> Path --> ./ --> CLuster URL --> NameSpace --> default
+
+kubectl get po  --> it created automatically from argocd
+
+kubectl get svc  --> copy paste the elb on browser
+
+now modify replica as 5 in GitHub deploy.yml , automatically argocd will deploy
+
+History and RollBack
+------
+
+Click on history and roll back --> three dots --> rollback
