@@ -1,0 +1,33 @@
+What is Terraform?
+
+History of Terraform
+
+Advantages of Terraform 
+
+Alternatives of Terraform
+
+Terraform vs Ansible Difference
+
+Terraform installation setup on Amazon Linux 2
+
+Terraform installation setup on Ubuntu
+
+Terraform File Structure
+
+Terraform Blocks , Labels, arguments
+
+Terraform Commands (init, validate, plan and apply)
+
+Writing Terraform Code to Automate Launching EC2 instance
+
+What is StateFile ?
+
+what is .terraform.lock.hcl?
+
+Local State and Remote State
+
+Current State vs Desired State
+
+COUNT Argument
+
+Single TARGET and Multi Target in Terraform code
