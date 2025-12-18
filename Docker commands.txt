@@ -1,5 +1,8 @@
 Docker Installation
 -------------------
+-- apt update/ yum update
+
+-- install aws cli 
 
 -- yum install docker -y
 
@@ -1803,4 +1806,5 @@ pwd= my-secret-pw
 
 create database test123;
 show databases;
+
 drop databases test123;
